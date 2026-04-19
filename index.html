@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WeatherPulse — Real-time weather dashboard with current conditions, 5-day forecast, hourly timeline, and favorites. Powered by Tomorrow.io API." />
+  <meta name="keywords" content="weather, dashboard, forecast, tomorrow.io, async, javascript, api" />
+  <meta name="author" content="WeatherPulse" />
+  <title>WeatherPulse — Real-Time Weather Dashboard</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Stunning Design Effects -->
+  <div class="noise-overlay" aria-hidden="true"></div>
+  <div id="mouse-glow" class="mouse-glow" aria-hidden="true"></div>
+
+  
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="bg-blob bg-blob--1"></div>
+    <div class="bg-blob bg-blob--2"></div>
+    <div class="bg-blob bg-blob--3"></div>
+  </div>
+
+  <!-- Particles -->
+  <div id="particles" class="particles" aria-hidden="true"></div>
+  <!-- ════════════════════════════════════════════════════
+       LOADING OVERLAY
+  ════════════════════════════════════════════════════ -->
+  <div id="app-loader" class="loader" aria-label="Loading application">
+    <div class="loader__spinner">
+      <svg viewBox="0 0 80 80" class="loader__svg">
+        <circle cx="40" cy="40" r="32" class="loader__circle"></circle>
+      </svg>
+    </div>
+    <p class="loader__text">Fetching the skies…</p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       HEADER
+  ════════════════════════════════════════════════════ -->
+  <header class="header" id="header">
+    <div id="scroll-progress" class="scroll-progress"></div>
+    <div class="header__inner container">
+      <a href="#" class="header__logo" id="logo">
+        <span class="header__logo-icon" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </span>
+        <span class="header__logo-text">WeatherPulse</span>
+      </a>
+
+      <!-- Search -->
+      <div class="search" id="search-container">
+        <div class="search__wrapper">
+          <svg class="search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            id="city-input"
+            class="search__input"
+            placeholder="Search city…"
+            autocomplete="off"
+            aria-label="Search for a city"
+          />
+          <button id="search-btn" class="search__btn" aria-label="Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
+        <!-- Suggestions dropdown -->
+        <ul id="search-suggestions" class="search__suggestions" role="listbox" aria-label="City suggestions"></ul>
+      </div>
+
+      <!-- Right controls -->
+      <div class="header__controls">
+        <button id="geo-btn" class="btn btn--icon" aria-label="Use my location" title="Use my location">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <line x1="1.05" y1="12" x2="7" y2="12"/>
+            <line x1="17.01" y1="12" x2="22.96" y2="12"/>
+            <line x1="12" y1="1" x2="12" y2="7"/>
+            <line x1="12" y1="17.01" x2="12" y2="22.96"/>
+          </svg>
+        </button>
+
+        <!-- Unit toggle -->
+        <div class="unit-toggle" id="unit-toggle" role="radiogroup" aria-label="Temperature unit">
+          <button class="unit-toggle__btn active" data-unit="metric" aria-checked="true" role="radio">°C</button>
+          <button class="unit-toggle__btn" data-unit="imperial" aria-checked="false" role="radio">°F</button>
+        </div>
+
+        <!-- Theme toggle -->
+        <button id="theme-toggle" class="btn btn--icon" aria-label="Toggle dark mode" title="Toggle theme">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════════════ -->
+  <main class="main container" id="main-content">
+
+    <!-- Error Toast -->
+    <div id="error-toast" class="toast toast--error" role="alert" aria-live="assertive" hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="15" y1="9" x2="9" y2="15"/>
+        <line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+      <span id="error-message"></span>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="success-toast" class="toast toast--success" role="status" aria-live="polite" hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <span id="success-message"></span>
+    </div>
+
+    <!-- ─── CURRENT WEATHER ─── -->
+    <section class="current reveal" id="current-weather" aria-label="Current weather">
+      <div class="current__shine"></div>
+      <div class="current__primary">
+        <div class="current__location-row">
+          <h1 id="current-city" class="current__city">—</h1>
+          <button id="fav-btn" class="btn btn--icon btn--fav" aria-label="Add to favorites" title="Add to favorites">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </button>
+        </div>
+        <p id="current-date" class="current__date">—</p>
+        <div class="current__temp-wrap">
+          <span id="current-icon" class="current__icon" aria-hidden="true">☀️</span>
+          <span id="current-temp" class="current__temp">—</span>
+        </div>
+        <p id="current-desc" class="current__desc">—</p>
+        <p id="current-feels" class="current__feels">Feels like —</p>
+      </div>
+
+      <div class="current__details" id="current-details">
+        <div class="detail-card" id="detail-humidity">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+          <span class="detail-card__value" id="humidity-value">—</span>
+          <span class="detail-card__label">Humidity</span>
+        </div>
+        <div class="detail-card" id="detail-wind">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+          </svg>
+          <span class="detail-card__value" id="wind-value">—</span>
+          <span class="detail-card__label">Wind</span>
+        </div>
+        <div class="detail-card" id="detail-pressure">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="4"/>
+            <path d="M12 8v8m-4-4h8"/>
+          </svg>
+          <span class="detail-card__value" id="pressure-value">—</span>
+          <span class="detail-card__label">Pressure</span>
+        </div>
+        <div class="detail-card" id="detail-visibility">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span class="detail-card__value" id="visibility-value">—</span>
+          <span class="detail-card__label">Visibility</span>
+        </div>
+        <div class="detail-card" id="detail-sunrise">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 18a5 5 0 0 0-10 0"/>
+            <line x1="12" y1="9" x2="12" y2="2"/>
+            <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
+            <line x1="1" y1="18" x2="3" y2="18"/>
+            <line x1="21" y1="18" x2="23" y2="18"/>
+            <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
+            <polyline points="8 2 12 6 16 2"/>
+          </svg>
+          <span class="detail-card__value" id="sunrise-value">—</span>
+          <span class="detail-card__label">Sunrise</span>
+        </div>
+        <div class="detail-card" id="detail-sunset">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 18a5 5 0 0 0-10 0"/>
+            <line x1="12" y1="2" x2="12" y2="9"/>
+            <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
+            <line x1="1" y1="18" x2="3" y2="18"/>
+            <line x1="21" y1="18" x2="23" y2="18"/>
+            <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
+            <polyline points="8 9 12 5 16 9"/>
+          </svg>
+          <span class="detail-card__value" id="sunset-value">—</span>
+          <span class="detail-card__label">Sunset</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 5-DAY FORECAST ─── -->
+    <section class="forecast reveal" id="forecast-section" aria-label="5-day forecast">
+      <h2 class="section-title">5-Day Forecast</h2>
+      <div class="forecast__grid" id="forecast-grid">
+        <!-- populated by JS -->
+      </div>
+    </section>
+
+    <!-- ─── HOURLY FORECAST ─── -->
+    <section class="hourly reveal" id="hourly-section" aria-label="Hourly forecast">
+      <h2 class="section-title">Hourly Forecast</h2>
+      <div class="hourly__scroll" id="hourly-scroll">
+        <!-- populated by JS -->
+      </div>
+    </section>
+
+    <!-- ─── FAVORITES ─── -->
+    <section class="favorites reveal" id="favorites-section" aria-label="Favorite cities">
+      <h2 class="section-title">Favorite Cities</h2>
+      <div class="favorites__grid" id="favorites-grid">
+        <!-- populated by JS -->
+      </div>
+      <p id="no-favorites" class="favorites__empty" hidden>No favorite cities yet. Search for a city and click the ★ to add it.</p>
+    </section>
+  </main>
+
+  <!-- ════════════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════════ -->
+  <footer class="footer" id="footer">
+    <div class="container footer__inner">
+      <p>&copy; 2026 WeatherPulse. Powered by <a href="https://www.tomorrow.io/" target="_blank" rel="noopener noreferrer">Tomorrow.io</a> Weather API.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts (ES modules) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
