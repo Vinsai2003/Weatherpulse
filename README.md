@@ -516,7 +516,7 @@ The app is a static site and can be deployed to any hosting platform:
 
 ## 📄 License
 
-This project is built for educational purposes as part of a web development course (Week 6: Advanced JavaScript & APIs).
+This project is built for educational purposes as part of a web development course ( Advanced JavaScript & APIs).
 
 ---
 
