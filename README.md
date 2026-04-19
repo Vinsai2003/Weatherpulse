@@ -1,6 +1,8 @@
 # ☁️ WeatherPulse — Weather Dashboard Application
 
 > A modern, responsive weather dashboard that fetches real-time data from the **Tomorrow.io** Weather API. Built with vanilla JavaScript using async/await, ES modules, and Local Storage persistence.
+>
+> 🚀 **[Live Project Link](https://weatherpulse-three.vercel.app/)**
 
 ![WeatherPulse Dashboard](screenshots/dashboard-light.png)
 
@@ -506,7 +508,10 @@ let state = {
 
 ## 🚢 Deployment
 
-The app is a static site and can be deployed to any hosting platform:
+The app is a static site and is currently live at:
+🔗 **[https://weatherpulse-three.vercel.app/](https://weatherpulse-three.vercel.app/)**
+
+To deploy your own version:
 
 - **GitHub Pages** — Push to `main`, enable Pages in repository settings
 - **Netlify** — Drag-and-drop the project folder
