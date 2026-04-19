@@ -521,5 +521,5 @@ This project is built for educational purposes as part of a web development cour
 ---
 
 <p align="center">
-  Built with ❤️ using vanilla JavaScript, async/await, and the Tomorrow.io Weather API.
+  Built with  vanilla JavaScript, async/await, and the Tomorrow.io Weather API.
 </p>
